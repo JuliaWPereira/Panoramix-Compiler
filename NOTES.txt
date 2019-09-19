@@ -1,0 +1,6 @@
+# How to execute the .l file with a .txt parameter file:
+
+$ flex file.l
+$ gcc lex.yy.c -lfl
+$ ./a.out < text.txt 
+
