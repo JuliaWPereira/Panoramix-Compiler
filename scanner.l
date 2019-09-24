@@ -1,8 +1,8 @@
 %{
 /* Flex program to do the lexical analysis of a text file. Its input should be a file as its output is.
-	@version 0.1
+	@version 0.2
 	@author Júlia Wotzasek Pereira and Vinícius Juliasse Dantas
-	@edited September 22, 2019
+	@edited September 24, 2019
 */
 
 /* Required packages */
@@ -49,17 +49,39 @@
 #define OTHER   505
 #define SPACE   506
 
+/* Errors */
+#define ERROR   600
+
+/* Line Counter */
+int num_lines = 1;
+
 %}
 
 digit [0-9]
 letter [a-zA-Z]
-identifier {letter}+
+identifier {letter}({letter}|{digit})*
 number {digit}+
 start \/\*
-end \*\/
+end \*\
 
 %%
-{start}[^*]*{end} {return COMMENT;}
+\n num_lines++; return ENTER;
+"/*" {
+	char c;
+	while(1)
+	{
+		c = input();
+		if(c == EOF) break;
+		if(c == '*')
+		{
+			c = input();
+			if(c == '/') break;
+		}
+		if(c == '\n'){
+			num_lines++;
+		}
+	}
+}
 else {return ELSE;}
 if {return IF;}
 int {return INT;}
@@ -79,7 +101,8 @@ while {return WHILE;}
 ">=" {return GEQ;}
 "==" {return EQUAL;}
 "!=" {return NEQ;}
-"=" {return ASSIG;}
+= {return ASSIG;}
+; {return SCOLON;}
 "," {return COLON;}
 "\(" {return OPEN_P;} 
 "\)" {return CLOSE_P;}
@@ -89,12 +112,12 @@ while {return WHILE;}
 "\}" {return CLOSE_K;}
 
 
-
 {identifier} {return ID;}
+{number}{letter} {return ERROR;}
 {number} {return NUM;}
-\n {return ENTER;}
 <<EOF>> {return END;}
-. {return SCOLON;}
+[:punct:] {return ERROR1;}
+. {return ERROR;}
 
 %%
 
@@ -107,101 +130,105 @@ int main()
 	f_out = fopen("saida.txt","w");
 	yyin = f_in;
 
-	while ((token = yylex()) != END)
+	while (((token = yylex()) != END) && (token != ERROR) && (token != ERROR1))
 	{
 		switch(token){
-			case COMMENT:
-				break;
-			case SPACE:
-				break;
-			case ELSE:
-				fprintf(f_out,"ELSE ");
-				break;
-			case IF:
-				fprintf(f_out,"IF ");
-				break;
-			case INT:
-				fprintf(f_out,"INT ");
-				break;
-			case RETURN:
-				fprintf(f_out,"RETURN ");
-				break;
-			case VOID:
-				fprintf(f_out,"VOID ");
-				break;
-			case WHILE:
-				fprintf(f_out,"WHILE ");
-				break;
-			case SUM:
-				fprintf(f_out,"SUM ");
-				break;
-			case SUB:
-				fprintf(f_out,"SUB ");
-				break;
-			case MULT:
-				fprintf(f_out,"MULT ");
-				break;
-			case DIV:
-				fprintf(f_out,"DIV ");
-				break;
-			case LEQ:
-				fprintf(f_out,"LEQ ");
-				break;
-			case LT:
-				fprintf(f_out,"LT ");
-				break;
-			case GT:
-				fprintf(f_out,"GT ");
-				break;
-			case GEQ:
-				fprintf(f_out,"GEQ ");
-				break;
-			case EQUAL:
-				fprintf(f_out,"EQUAL ");
-				break;
-			case NEQ:
-				fprintf(f_out,"NEQ ");
-				break;
-			case ASSIG:
-				fprintf(f_out,"ASSIG ");
+		case COMMENT:
+			break;
+		case SPACE:
+			break;
+		case ELSE:
+			fprintf(f_out,"ELSE ");
+			break;
+		case IF:
+			fprintf(f_out,"IF ");
+			break;
+		case INT:
+			fprintf(f_out,"INT ");
+			break;
+		case RETURN:
+			fprintf(f_out,"RETURN ");
+			break;
+		case VOID:
+			fprintf(f_out,"VOID ");
+			break;
+		case WHILE:
+			fprintf(f_out,"WHILE ");
+			break;
+		case SUM:
+			fprintf(f_out,"SUM ");
+			break;
+		case SUB:
+			fprintf(f_out,"SUB ");
+			break;
+		case MULT:
+			fprintf(f_out,"MULT ");
+			break;
+		case DIV:
+			fprintf(f_out,"DIV ");
+			break;
+		case LEQ:
+			fprintf(f_out,"LEQ ");
+			break;
+		case LT:
+			fprintf(f_out,"LT ");
+			break;
+		case GT:
+			fprintf(f_out,"GT ");
+			break;
+		case GEQ:
+			fprintf(f_out,"GEQ ");
+			break;
+		case EQUAL:
+			fprintf(f_out,"EQUAL ");
+			break;
+		case NEQ:
+			fprintf(f_out,"NEQ ");
+			break;
+		case ASSIG:
+			fprintf(f_out,"ASSIG ");
 
-			case COLON:
-				fprintf(f_out,"COLON ");
-				break;
-			case OPEN_P:
-				fprintf(f_out,"OPEN_P ");
-				break;
-			case CLOSE_P:
-				fprintf(f_out,"CLOSE_P ");
-				break;
-			case OPEN_B:
-				fprintf(f_out,"OPEN_B ");
-				break;
-			case CLOSE_B:
-				fprintf(f_out,"CLOSE_B ");
-				break;
-			case OPEN_K:
-				fprintf(f_out,"OPEN_K ");
-				break;
-			case CLOSE_K:
-				fprintf(f_out,"CLOSE_K ");
-				break;
-			
-			case NUM:
-				fprintf(f_out,"NUM ");
-				break;
-			case ID:
-				fprintf(f_out,"ID ");
-				break;
-			case ENTER:
-				fprintf(f_out,"\n");
-				break;
-			case OTHER:
-				fprintf(f_out,"SCOLON ");
-				break;
-			default:
-				fprintf(f_out,"SCOLON ");
+		case COLON:
+			fprintf(f_out,"COLON ");
+			break;
+		case OPEN_P:
+			fprintf(f_out,"OPEN_P ");
+			break;
+		case CLOSE_P:
+			fprintf(f_out,"CLOSE_P ");
+			break;
+		case OPEN_B:
+			fprintf(f_out,"OPEN_B ");
+			break;
+		case CLOSE_B:
+			fprintf(f_out,"CLOSE_B ");
+			break;
+		case OPEN_K:
+			fprintf(f_out,"OPEN_K ");
+			break;
+		case CLOSE_K:
+			fprintf(f_out,"CLOSE_K ");
+			break;
+		
+		case NUM:
+			fprintf(f_out,"NUM ");
+			break;
+		case ID:
+			fprintf(f_out,"ID ");
+			break;
+		case ENTER:
+			fprintf(f_out,"\n");
+			break;
+		case OTHER:
+			fprintf(f_out,"SCOLON ");
+			break;
+		default:
+			fprintf(f_out,"SCOLON ");
 		}
+	}
+	if(token == ERROR)
+	{
+		printf("Lexical Error at line %d.\n",num_lines);
 	}
 	return(0);
 }
