@@ -113,10 +113,10 @@ while {return WHILE;}
 
 
 {identifier} {return ID;}
-{number}{letter} {return ERROR;}
+{identifier}['!'|'@'|'#'|'$'|'%'|'&']+.* {return ERROR;}
+{number}['!'|'@'|'#'|'$'|'%'|'&'|{letter}]+.* {return ERROR;}
 {number} {return NUM;}
 <<EOF>> {return END;}
-[:punct:] {return ERROR1;}
 . {return ERROR;}
 
 %%
@@ -130,7 +130,7 @@ int main()
 	f_out = fopen("saida.txt","w");
 	yyin = f_in;
 
-	while (((token = yylex()) != END) && (token != ERROR) && (token != ERROR1))
+	while (((token = yylex()) != END) && (token != ERROR))
 	{
 		switch(token){
 		case COMMENT:
@@ -228,7 +228,7 @@ int main()
 	}
 	if(token == ERROR)
 	{
-		printf("Lexical Error at line %d.\n",num_lines);
+		printf("Lexical Error at line %d at word %s. \n",num_lines,yytext);
 	}
 	return(0);
 }
