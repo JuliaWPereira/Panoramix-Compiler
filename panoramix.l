@@ -95,6 +95,7 @@ while {return WHILE;}
   * it is followed by the pattern after the '/'
   * symbol. The trailing context do not pop the
   * symbol from the buffer.
+ */
 [a-zA-Z]+/([^0-9]) {printf("ID\n");return ID;}
 [0-9]+/([^a-zA-Z]) {printf("NUM\n");return NUM;}
 
